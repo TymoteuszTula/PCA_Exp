@@ -40,4 +40,12 @@ class DataHandler:
             library)
         '''
 
+        no_meas = stsp[1] - stsp[0] - len(excep) + 1
+        batch = []
+
+        for meas in range(no_meas):
+            path = loc + prenum + str(stsp[0] + meas) + ext
+            temp_mat = np.loadtxt(path)
+            batch.append(temp_mat)
+
         raise NotImplementedError
