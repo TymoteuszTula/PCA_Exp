@@ -12,6 +12,7 @@ class DataHandler:
 
     def __init__(self):
         self.batches = []
+        self.batches_names = []
 
     def load_batch(self, stsp, prenum='', ext='', loc='./', excep=[], name='',
                    indicators=[]):
@@ -36,16 +37,26 @@ class DataHandler:
             from textfiles. Set to an empty list as default.
             name: String. User can name a given batch of file (e.g. specific 
             material) so that it can be extracted later more intuitively.
-            indicators: List of lists of floats (TODO: make indicators a 
-            library)
+            indicators: List of lists of floats (TODO: make indicators work)
         '''
 
         no_meas = stsp[1] - stsp[0] - len(excep) + 1
         batch = []
+    
+        enum = np.delete(range(stsp[0], stsp[1] + 1), excep)
 
-        for meas in range(no_meas):
-            path = loc + prenum + str(stsp[0] + meas) + ext
+        for meas in enum:
+            path = loc + prenum + str(meas) + ext
             temp_mat = np.loadtxt(path)
             batch.append(temp_mat)
+
+        self.batches.append(np.array(batch))
+        self.batches_names.append(name)
+
+    def prepare_XYE(self, batch_ind=[0], batch_names=[]):
+        r''' Function that prepares the choosen data batches into matrix form,
+        that is all of the y, x and error vectors are presented as matrices
+        X, Y and E.
+        '''
 
         raise NotImplementedError
