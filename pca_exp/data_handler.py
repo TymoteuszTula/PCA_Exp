@@ -15,7 +15,7 @@ class DataHandler:
         self.batches_names = []
 
     def load_batch(self, stsp, prenum='', ext='', loc='./', excep=[], name='',
-                   indicators=[]):
+                   indicators=[], delimiter=None, skiprows=0):
         r''' Function that adds a batch of data to the class from a set of 
         files in one folder. The batch is stored as 3-D numpy array where
         each batch[:,:,n] matrix is a n-th measurements with columns 
@@ -47,7 +47,7 @@ class DataHandler:
 
         for meas in enum:
             path = loc + prenum + str(meas) + ext
-            temp_mat = np.loadtxt(path)
+            temp_mat = np.loadtxt(path, delimiter=delimiter, skiprows=skiprows)
             batch.append(temp_mat)
 
         self.batches.append(np.array(batch))
@@ -56,7 +56,11 @@ class DataHandler:
     def prepare_XYE(self, batch_ind=[0], batch_names=[]):
         r''' Function that prepares the choosen data batches into matrix form,
         that is all of the y, x and error vectors are presented as matrices
-        X, Y and E.
+        Y, X and E. (TODO: make batch_names work)
+        Args:
+
         '''
+
+        y_points = self.batches[batch_ind[0]].shape(1)
 
         raise NotImplementedError
