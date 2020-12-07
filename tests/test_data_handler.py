@@ -27,7 +27,8 @@ dataHandler.load_batch(stsp=stsp_ba, prenum=prenum_ba, ext=ext_ba, loc=loc_ba,
 
 
 
-print(dataHandler.batches[0])
+print(dataHandler.batches[0].shape)
+print(dataHandler.batches[1].shape)
 
 
 

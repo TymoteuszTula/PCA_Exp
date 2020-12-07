@@ -50,6 +50,8 @@ class DataHandler:
             temp_mat = np.loadtxt(path, delimiter=delimiter, skiprows=skiprows)
             batch.append(temp_mat)
 
+        batch = np.transpose(batch, (1, 0, 2))    
+
         self.batches.append(np.array(batch))
         self.batches_names.append(name)
 
@@ -62,5 +64,25 @@ class DataHandler:
         '''
 
         y_points = self.batches[batch_ind[0]].shape(1)
+
+
+
+        raise NotImplementedError
+
+    def bin_data(self, x_0, batch_ind=[0], batch_names=[]):
+        r''' Function that bin the data to common bins. Use it if your batches
+        have different x sizes.
+        Args:
+
+        '''
+
+        raise NotImplementedError
+
+    def slice_batch(self, batch_ind, x_inds, x_vals = None):
+        r''' Function that cuts off the data points of a given batch. Can give
+        a index value or a x cutoff value
+        Args:
+
+        '''
 
         raise NotImplementedError
