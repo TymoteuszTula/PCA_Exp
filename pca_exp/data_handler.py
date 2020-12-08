@@ -6,6 +6,10 @@
 
 import numpy as np
 
+# internal modules
+
+from utils.utils import find_ind_val
+
 class DataHandler:
     r''' Class which takes the experimental data and preprocess it if 
     neccessery before the ML procedure. '''
@@ -78,11 +82,21 @@ class DataHandler:
 
         raise NotImplementedError
 
-    def slice_batch(self, batch_ind, x_inds, x_vals = None):
+    def slice_batch(self, batch_ind, x_inds=None, x_vals=None):
         r''' Function that cuts off the data points of a given batch. Can give
         a index value or a x cutoff value
         Args:
 
         '''
 
-        raise NotImplementedError
+        if x_vals == None and x_inds != None:
+            self.batches[batch_ind] = (
+                self.batches[batch_ind][x_inds[0]:x_inds[1],:,:])
+        elif x_vals != None and x_inds == None:
+            x_ind0 = find_ind_val(self.batches[batch_ind][:,0,0], x_vals[0])
+            x_ind1 = find_ind_val(self.batches[batch_ind][:,0,0], x_vals[1])
+            self.batches[batch_ind] = (
+                self.batches[batch_ind][x_ind0:x_ind1,:,:])
+        else:
+            raise Exception("Either x_inds or x_vals needs to be specified!")
+
