@@ -13,7 +13,8 @@ class PCAMachine:
     '''
 
     def __init__(self):
-        raise NotImplementedError
+        self.pc_scores = []
+        self.pc_curves = []
 
 
     
