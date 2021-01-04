@@ -6,6 +6,7 @@ sys.path.append('./pca_exp')
 import numpy as np
 import matplotlib.pyplot as plt
 import data_handler as dh
+from pca_machine import PCAMachine
 
 dataHandler = dh.DataHandler()
 
@@ -44,18 +45,21 @@ x_0 = np.linspace(1, 10, num=300)
 
 dataHandler.bin_data(x_0, [0, 1])
 
+dataHandler.prepare_XYE_PCA([0, 1])
+
+pcaMachine = PCAMachine()
+
+pcaMachine.perform_pca(dataHandler)
+
 plt.figure(1)
-plt.plot(dataHandler.batches[0][:,0,1])
-plt.plot(dataHandler.batches[1][:,0,1])
-
-
-A, E, Len, t = dataHandler.filter_data([0,1])
+plt.plot(dataHandler.prepared_data[0][1,:,0], pcaMachine.pc_curves[0][:,5])
 
 plt.figure(2)
-plt.plot(t[:,0], A[:,0])
-plt.plot(t[:,0], A[:,18])
+plt.plot(pcaMachine.pc_sing[0])
 
 plt.show()
+
+
 
 
 

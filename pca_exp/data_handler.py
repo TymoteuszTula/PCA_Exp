@@ -12,11 +12,12 @@ from utils.utils import find_ind_val
 
 class DataHandler:
     r''' Class which takes the experimental data and preprocess it if 
-    neccessery before the ML procedure. '''
+    neccessery, before the ML procedure. '''
 
     def __init__(self):
         self.batches = []
         self.batches_names = []
+        self.prepared_data = []
 
     def load_batch(self, stsp, prenum='', ext='', loc='./', excep=[], name='',
                    indicators=[], delimiter=None, skiprows=0):
@@ -67,7 +68,9 @@ class DataHandler:
 
         '''
 
-        raise NotImplementedError
+        a, e, _, x = self.filter_data(batch_ind=batch_ind)
+
+        self.prepared_data.append(np.array([a, x]))
 
     def filter_data(self, batch_ind=[0]):
         r''' Function that re-bin the data to equalise the error in each bin.
