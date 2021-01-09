@@ -6,6 +6,7 @@ components, scores and other information
 
 # libraries
 import numpy as np
+import matplotlib.pyplot as plt
 
 class PCAMachine:
     r''' Class which holds the functions and variables used in PCA of 
@@ -31,6 +32,10 @@ class PCAMachine:
         self.pc_av.append(av)
         self.pc_sing.append(sing)
         self.pc_z.append(z)
+
+    def show_pca_results(self):
+        
+
 
 
 
