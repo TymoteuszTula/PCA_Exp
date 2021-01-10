@@ -34,6 +34,7 @@ class PCAMachine:
         self.pc_z.append(z)
 
     def show_pca_results(self):
+        pass
         
 
 

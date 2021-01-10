@@ -2,11 +2,13 @@
 
 import sys
 sys.path.append('./pca_exp')
+sys.path.append('./pca_exp/generate_samples')
 
 import numpy as np
 import matplotlib.pyplot as plt
 import data_handler as dh
 from pca_machine import PCAMachine
+from kubo_toyabe import generateKT
 
 dataHandler = dh.DataHandler()
 

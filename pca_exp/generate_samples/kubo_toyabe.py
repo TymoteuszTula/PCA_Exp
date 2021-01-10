@@ -54,8 +54,8 @@ def generateKT(t, a0, ab, sig=(0, 1), Lam=(0, 1), er=0.1, no_samples=100):
     if type(er) == int:
         noise = er * np.random.randn(t.size, no_samples)
     elif type(er) == np.array:
-        assert er.ndim = 1, 'er has to be a vector.'
-        assert er.size = t.size, 'er size has to be equal to t size.'
+        assert er.ndim == 1, 'er has to be a vector.'
+        assert er.size == t.size, 'er size has to be equal to t size.'
         noise = er[np.newaxis].T * np.random.randn(t.size, no_samples)
     else:
         raise ValueError('er should be either integer or a vector.')
