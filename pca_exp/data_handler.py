@@ -60,6 +60,21 @@ class DataHandler:
         self.batches.append(np.array(batch))
         self.batches_names.append(name)
 
+    def load_batch_from_array(self, asymm, name=''):
+        r''' Function that load batch from numpy array. The array should be of
+        form (i, j, k), where i iterates over different x values, j
+        iterates over different measurements and k can have three values 
+        with k=0 representing two-dimensional array of x values,
+        k=1 representing the y values and k=2 representing the y errors.
+
+        Args:
+            asymm: three-dimensional array of data
+            name: name for the batch of data
+        '''
+
+        self.batches.append(asymm)
+        self.batches_names.append(name)
+
     def prepare_XYE_PCA(self, batch_ind=[0], batch_names=[]):
         r''' Function that prepares the choosen data batches into matrix form,
         that is all of the y, x and error vectors are presented as matrices

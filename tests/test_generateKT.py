@@ -15,9 +15,18 @@ a0 = 0.26
 ab = 0
 sig = (0.1, 1)
 Lam = (0.1, 2)
-er = 0.2 * (np.exp(0.01 * t) + 0.1)
+er = 0.02 * (np.exp(0.1 * t) + 0.01)
 no_samples = 2000
 
-g = generateKT(t, a0, ab, sig, Lam, er, no_samples)
+gKT = generateKT(t, a0, ab, sig, Lam, er, no_samples)
 
 dh = DataHandler()
+dh.load_batch_from_array(gKT)
+dh.filter_data()
+dh.prepare_XYE_PCA()
+
+pca_machine = PCAMachine()
+pca_machine.perform_pca(dh)
+
+
+
