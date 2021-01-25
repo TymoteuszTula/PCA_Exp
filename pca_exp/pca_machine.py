@@ -62,8 +62,14 @@ class PCAMachine:
     def show_pca_results_1(self, param1, param2, res_idx=0, prep_idx=0):
 
         x = self.data_handler.prepared_data[prep_idx][1][:,0]
-     
-        fig1 = plt.figure(1, figsize=[12, 12], dpi=100)
+
+        plt.style.use(['dark_background'])
+        plt.rcParams['font.size'] = '12'
+        plt.rcParams['lines.markersize'] = '5'
+
+
+        # First figure
+        fig1 = plt.figure(1, figsize=[10, 6], dpi=50)
         
         plt.subplot(221)
         plt.title('PC curves')
@@ -74,34 +80,92 @@ class PCAMachine:
         plt.legend()
         plt.xlabel('x')
         plt.ylabel('PC vectors')
+        plt.grid()
 
         plt.subplot(222)
         plt.title('Scree plot')
         sing_norm = 100 * self.pc_sing[res_idx] / np.sum(self.pc_sing[res_idx])
-        plt.plot(np.arange(1, sing_norm.size+1), sing_norm, '-sk')
+        plt.plot(np.arange(1, sing_norm.size+1), sing_norm, '-sr')
         plt.xlabel('PC no.')
         plt.ylabel('Covariance captured [%]')
+        plt.grid()
 
         plt.subplot(223)
         plt.title('PC1 vs PC2 (param1)')
         plt.scatter(self.pc_scores[res_idx][0,:], 
                     self.pc_scores[res_idx][1,:],
                     c=param1)
-        cbar = plt.colorbar(shrink=0.5, pad = 0, fraction=0.08)
+        cbar = plt.colorbar(pad = 0, fraction=0.08)
         plt.xlabel('PC1 score')
         plt.ylabel('PC2 score')
+        plt.grid()
 
         plt.subplot(224)
         plt.title('PC1 vs PC2 (param1)')
         plt.scatter(self.pc_scores[res_idx][0,:], 
                     self.pc_scores[res_idx][1,:],
                     c=param2)
-        cbar = plt.colorbar(shrink=0.5, pad = 0, fraction=0.08)
+        cbar = plt.colorbar(pad = 0, fraction=0.08)
         plt.xlabel('PC1 score')
         plt.ylabel('PC2 score')
+        plt.grid()
 
         plt.tight_layout()
+        
+        # Second figure
+        fig2 = plt.figure(2, figsize=[20, 6], dpi=50)
+        plt.suptitle('Principal component scores vs (param)')
+        
+        plt.subplot(241)
+        plt.title('1st PC scores')
+        plt.plot(param1, self.pc_scores[res_idx][0,:], 'or')
+        plt.xlabel('param1')
+        plt.ylabel('PC scores vs param1')
+        plt.grid()
+
+        plt.subplot(242)
+        plt.title('2nd PC scores')
+        plt.plot(param1, self.pc_scores[res_idx][1,:], 'ob')
+        plt.xlabel('param1')
+        plt.grid()
+
+        plt.subplot(243)
+        plt.title('3rd PC scores')
+        plt.plot(param1, self.pc_scores[res_idx][2,:], 'og')
+        plt.xlabel('param1')
+        plt.grid()
+
+        plt.subplot(244)
+        plt.title('4th PC scores')
+        plt.plot(param1, self.pc_scores[res_idx][3,:], 'oc')
+        plt.xlabel('param1')
+        plt.grid()
+
+        plt.subplot(245)
+        plt.plot(param2, self.pc_scores[res_idx][0,:], 'or')
+        plt.ylabel('PC scores vs param2')
+        plt.xlabel('param2')
+        plt.grid()
+
+        plt.subplot(246)
+        plt.plot(param2, self.pc_scores[res_idx][1,:], 'ob')
+        plt.xlabel('param2')
+        plt.grid()
+
+        plt.subplot(247)
+        plt.plot(param2, self.pc_scores[res_idx][2,:], 'og')
+        plt.xlabel('param2')
+        plt.grid()
+
+        plt.subplot(248)
+        plt.plot(param2, self.pc_scores[res_idx][2,:], 'oc')
+        plt.xlabel('param2')
+        plt.grid()
+
+        plt.tight_layout()
+
         plt.show()
+
         
         
 

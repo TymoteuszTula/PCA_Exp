@@ -13,8 +13,8 @@ from data_handler import DataHandler
 t = np.linspace(0, 12, num=300)
 a0 = 0.26
 ab = 0
-sig = (0.1, 1)
-Lam = (0.1, 2)
+sig = (0.1, 0.5)
+Lam = (0.1, 0.5)
 er = 0.02 * (np.exp(0.1 * t) + 0.01)
 no_samples = 2000
 
