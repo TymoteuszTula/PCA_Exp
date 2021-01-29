@@ -1,7 +1,7 @@
 # pca_machine.py
 
 ''' Code contains the class which performs PCA and returns principal 
-components, scores and other information
+components, scores and other information.
 '''
 
 # libraries
@@ -11,7 +11,31 @@ import matplotlib.pyplot as plt
 
 class PCAMachine:
     r''' Class which holds the functions and variables used in PCA of 
-    experimental data
+    experimental data.
+
+    Params:
+        data_handler: pca_exp.data_handler class specifing the instance that
+        holds processed data, used in PCA algorithm.
+
+    Attribs:
+        pc_scores: list of 2D numpy arrays that holds the PC scores of each
+        PCA. The 2D array have indices [i, j], where i runs through PC 
+        numbers and j runs through different measurements.
+
+        pc_curves: list of 2D numpy arrays that holds the PC curves of each
+        PCA. The 2D array have indices [i, j], where i runs through x values 
+        and j runs through different PC numbers.
+
+        pc_av: list of 1D numpy arrays, which hold the average of each PCA.
+
+        pc_sing: list of 1D numy arrays, which hold singular values of each
+        PCA.
+
+        pc_z: list of 2D numpy array, which holds the initial measurement
+        curves, with removed average.
+
+        data_handler: pca_exp.data_handler class specifing the instance that
+        holds processed data, used in PCA algorithm.
     '''
 
     def __init__(self, data_handler):
@@ -23,6 +47,9 @@ class PCAMachine:
         self.data_handler = data_handler
 
     def print_pca_representation(self):
+        r''' Function that prints the scree plot in the console log of a last
+        principal component analysis.
+        '''
         sing_total = np.sum(self.pc_sing[-1])
         sing_show = self.pc_sing[-1][:8] * 100 / sing_total
         
@@ -40,6 +67,14 @@ class PCAMachine:
 
 
     def perform_pca(self, prep_ind = 0):
+        r''' Function that performs the principal component analysis on the 
+        data specified by prep_ind. It save the results in attributes of the 
+        class.
+
+        Args:
+            prep_ind: integer that specifies the data, on which PCA is 
+            performed.
+        '''
         data_hand = self.data_handler
         a = data_hand.prepared_data[prep_ind][0]
         av = np.sum(a, axis = 1)[np.newaxis].T / a.shape[1]
@@ -47,9 +82,7 @@ class PCAMachine:
 
         print('Performing PCA on prepared data')
         curves, sing, _ = np.linalg.svd(z)
-        scores = np.dot(curves.T, z)
-
-        print('Showing the percentage of covariance of most important PCs:')
+        scores = np.dot(curves.T, z)  
 
         self.pc_scores.append(scores)
         self.pc_curves.append(curves)
@@ -57,9 +90,28 @@ class PCAMachine:
         self.pc_sing.append(sing)
         self.pc_z.append(z)
 
+        print('Showing the percentage of covariance of most important PCs:')
         self.print_pca_representation()
 
     def show_pca_results_1(self, param1, param2, res_idx=0, prep_idx=0):
+        r''' Function that prints plots showing the result of PCA. This
+        function shows scree plot, PC curves and 1st PC vs 2nd PC scores
+        as well as up to 4th PC scores vs paramters specified in param1,
+        param2.
+
+        Args:
+            param1: list or 1D numpy.array of float values of a first chosen 
+            parameter
+
+            param2: list or 1D numpy.array of float values of a second chosen 
+            parameter
+
+            res_idx: integer, specifing the index of the results stored in this
+            instance of the class.
+
+            prep_idx: integer, specyfing the index of prepared data in 
+            self.data_handler.
+        '''
 
         x = self.data_handler.prepared_data[prep_idx][1][:,0]
 

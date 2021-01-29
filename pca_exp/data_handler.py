@@ -12,7 +12,18 @@ from utils.utils import find_ind_val
 
 class DataHandler:
     r''' Class which takes the experimental data and preprocess it if 
-    neccessery, before the ML procedure. '''
+    neccessary, before the ML procedure.
+
+    Attribs:
+        batches: list of batches of data. Each batch is a 3d numpy array with
+        indices [i, j, k], where i runs through x arguments of data, 
+        j ∈ {x, y, error} and k runs through all measurements of the batch.
+
+        batches_names: list of names for the batch (not yet implemented).
+
+        prepared_data: list of preprocessed data that can be feed to 
+        pca_machine module.
+    '''
 
     def __init__(self):
         self.batches = []
@@ -32,14 +43,19 @@ class DataHandler:
         Args:
             stsp: Tuple of two ints (start, stop) which indicate starting and 
             ending file number.
+
             prenum: String indicating the beginning of the filename, before
-            numbering. Empty string in default
+            numbering. Empty string in default.
+
             ext: String defining type of extension at the end of the file 
             without '.'. Empty string in default.
+
             loc: String indicating location of the files. Set as the folder 
             with the python script in default.
+
             excep: List of integers that should be omitted when extracting data
             from textfiles. Set to an empty list as default.
+
             name: String. User can name a given batch of file (e.g. specific 
             material) so that it can be extracted later more intuitively.
             indicators: List of lists of floats (TODO: make indicators work)
@@ -69,6 +85,7 @@ class DataHandler:
 
         Args:
             asymm: three-dimensional array of data
+
             name: name for the batch of data
         '''
 
@@ -79,8 +96,13 @@ class DataHandler:
         r''' Function that prepares the choosen data batches into matrix form,
         that is all of the y, x and error vectors are presented as matrices
         Y, X and E. (TODO: make batch_names work)
-        Args:
 
+        Args:
+            batch_ind: list of integers that specify which batches are 
+            preprocessed together.
+
+            batch_names: alternatively, names of batches that will be
+            preprocessed together (not yet implemented)
         '''
 
         a, e, _, x = self.filter_data(batch_ind=batch_ind)
@@ -89,8 +111,10 @@ class DataHandler:
 
     def filter_data(self, batch_ind=[0]):
         r''' Function that re-bin the data to equalise the error in each bin.
-        Args:
 
+        Args:
+            batch_ind: list of integers that specify which batches are 
+            preprocessed together.
         '''
 
         # TODO write better code (this was taken from previous version of the
@@ -149,8 +173,13 @@ class DataHandler:
     def bin_data(self, x_0, batch_ind=[0], batch_names=[]):
         r''' Function that bin the data to common bins. Use it if your batches
         have different x sizes.
-        Args:
 
+        Args:
+            batch_ind: list of integers that specify which batches are 
+            preprocessed together.
+
+            batch_names: alternatively, names of batches that will be
+            preprocessed together (not yet implemented)
         '''
 
         # TODO: write better code
@@ -182,9 +211,16 @@ class DataHandler:
 
     def slice_batch(self, batch_ind, x_inds=None, x_vals=None):
         r''' Function that cuts off the data points of a given batch. Can give
-        a index value or a x cutoff value
-        Args:
+        index value or x cutoff value.
 
+        Args:
+            batch_ind: integer of the batch.
+
+            x_inds: tuple of two integers (x_start, x_stop), which specify the
+            cut off indices.
+
+            x_vals: tuple of two floats (x_start_val, x_stop_val), which 
+            specify cut off values.
         '''
 
         if x_vals == None and x_inds != None:

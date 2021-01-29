@@ -7,11 +7,31 @@ with randomised noise.
 import numpy as np
 
 def generateKT(t, a0, ab, sig=(0, 1), Lam=(0, 1), er=0.1, no_samples=100):
-    r''' Functions that generates the Kubo Toyabe functions with gaussian noise 
-    dependent on the time variable t.
+    r''' Function that generates the Kubo Toyabe curves with gaussian noise, 
+    which can be dependent on the time variable t.
     
     Args:
-        ...
+        t: 1D numpy array that holds values of time windows.
+
+        a0: float that specifies the initial asymmetry.
+
+        ab: float that specifies the background asymmetry.
+
+        sig: tuple of two floats (sig_min, sig_max) that specifies minimum 
+        and maximum values of sigma parameter. Alternatively 1D numpy array
+        that specifies values of sigma parameter directly.
+
+        Lam: tuple of two floats (Lam_min, Lam_max) that specifies minimum 
+        and maximum values of Lambda parameter. Alternatively 1D numpy array
+        that specifies values of Lambda parameter directly. If both sig and Lam
+        are 1D numpy arrays, then their size must match.
+
+        er: float that specifies the uniform standard deviation over all 
+        samples. Alternatively 1D numpy array of the same size as t, that 
+        specify the error as a function of time.
+
+        no_samples: number of measurements generated. Only needed if both sig
+        and Lam are tuples.
     '''
     
     t = t[np.newaxis].T
