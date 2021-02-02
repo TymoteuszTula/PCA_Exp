@@ -8,7 +8,7 @@ import numpy as np
 
 # internal modules
 
-from utils.utils import find_ind_val
+from .utils.utils import find_ind_val
 
 class DataHandler:
     r''' Class which takes the experimental data and preprocess it if 

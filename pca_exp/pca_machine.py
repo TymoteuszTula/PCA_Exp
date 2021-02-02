@@ -93,7 +93,90 @@ class PCAMachine:
         print('Showing the percentage of covariance of most important PCs:')
         self.print_pca_representation()
 
-    def show_pca_results_1(self, param1, param2, res_idx=0, prep_idx=0):
+    def show_pca_results_1(self, param1, param1_name='param1', res_idx=0,
+                                 prep_idx=0):
+        r''' Function that prints plots showing the result of PCA. This
+        function shows scree plot, PC curves and 1st PC vs 2nd PC scores
+        as well as up to 4th PC scores vs paramters specified in param1.
+
+        Args:
+            param1: list or 1D numpy.array of float values of a chosen 
+            parameter
+
+            param1_name: string of the name of the chosen parameter
+
+            res_idx: integer, specifing the index of the results stored in this
+            instance of the class.
+
+            prep_idx: integer, specyfing the index of prepared data in 
+            self.data_handler.
+        '''
+
+        x = self.data_handler.prepared_data[prep_idx][1][:,0]
+
+        plt.style.use(['dark_background'])
+        plt.rcParams['font.size'] = '12'
+        plt.rcParams['lines.markersize'] = '5'
+
+
+        # First figure
+        fig1 = plt.figure(1, figsize=[12, 5], dpi=50)
+        
+        plt.subplot(121)
+        plt.title('PC curves')
+        plt.plot(x, self.pc_curves[res_idx][:,0], '-o', label='1st PC')
+        plt.plot(x, self.pc_curves[res_idx][:,1], '-o', label='2nd PC')
+        plt.plot(x, self.pc_curves[res_idx][:,2], '-o', label='3rd PC')
+        plt.plot(x, self.pc_curves[res_idx][:,3], '-o', label='4th PC')
+        plt.legend()
+        plt.xlabel('x')
+        plt.ylabel('PC vectors')
+        plt.grid()
+
+        plt.subplot(122)
+        plt.title('Scree plot')
+        sing_norm = 100 * self.pc_sing[res_idx] / np.sum(self.pc_sing[res_idx])
+        plt.plot(np.arange(1, sing_norm.size+1), sing_norm, '-sr')
+        plt.xlabel('PC no.')
+        plt.ylabel('Covariance captured [%]')
+        plt.grid()
+
+        plt.tight_layout()
+        
+        # Second figure
+        fig2 = plt.figure(2, figsize=[20, 5], dpi=50)
+        plt.suptitle('Principal component scores vs ' + param1_name)
+        
+        plt.subplot(141)
+        plt.title('1st PC scores')
+        plt.plot(param1, self.pc_scores[res_idx][0,:], 'or')
+        plt.xlabel(param1_name)
+        plt.ylabel('PC scores vs ' + param1_name)
+        plt.grid()
+
+        plt.subplot(142)
+        plt.title('2nd PC scores')
+        plt.plot(param1, self.pc_scores[res_idx][1,:], 'ob')
+        plt.xlabel(param1_name)
+        plt.grid()
+
+        plt.subplot(143)
+        plt.title('3rd PC scores')
+        plt.plot(param1, self.pc_scores[res_idx][2,:], 'og')
+        plt.xlabel(param1_name)
+        plt.grid()
+
+        plt.subplot(144)
+        plt.title('4th PC scores')
+        plt.plot(param1, self.pc_scores[res_idx][3,:], 'oc')
+        plt.xlabel(param1_name)
+        plt.grid()
+
+        plt.tight_layout()
+
+        plt.show()
+
+    def show_pca_results_2(self, param1, param2, res_idx=0, prep_idx=0):
         r''' Function that prints plots showing the result of PCA. This
         function shows scree plot, PC curves and 1st PC vs 2nd PC scores
         as well as up to 4th PC scores vs paramters specified in param1,
