@@ -22,5 +22,7 @@ Put the pca_exp folder in your working directory.
 ### Usage
 Check the jupyter notebook pca_exp_tutorial.ipynb for a quick tutorial that explains most functionalities of the code.
 
+Also check github page of this code for most recent version of tutorial and the software at: https://github.com/TymoteuszTula/PCA_Exp.
+
 ### License
 Standard GNU General Public License v3.0. Check COPYING file.
