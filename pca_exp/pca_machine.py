@@ -301,6 +301,15 @@ class PCAMachine:
 
         plt.show()
 
+    def turn_pc_into_2D(self, res_idx=0, x_no):
+        r''' Function takes the results of PCA and turns it back to 2D data.
+        '''
+
+        self.pc_av[res_idx] = np.reshape(self.pc_av[res_idx], (x_no, 
+                                        self.pc_ac[res_idx].shape[1] / x_no))
+        self.pc_curves[res_idx] = np.reshape(self.pc_curves[res_idx], (x_no, 
+                                    self.pc_curves[res_idx].shape[1] / x_no))
+
         
         
 
