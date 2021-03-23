@@ -301,7 +301,7 @@ class PCAMachine:
 
         plt.show()
 
-    def turn_pc_into_2D(self, res_idx=0, x_no):
+    def turn_pc_into_2D(self, x_no, res_idx=0):
         r''' Function takes the results of PCA and turns it back to 2D data.
         '''
 
