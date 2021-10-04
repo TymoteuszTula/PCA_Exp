@@ -46,6 +46,29 @@ class ConfusionMachine:
 
         return acc
 
+    def perform_confusion_external(self, pcs, param, param_range, up_to=5):
+
+        acc = []
+
+        pc_scores = pcs[:up_to,:].T
+        pc_size = pc_scores.shape[0]
+
+        for N_c in param_range:
+            idx_less = np.argwhere(param < N_c)[:,0]
+            labels = np.zeros((pc_size,))
+            labels[idx_less] = np.ones((idx_less.size,))
+
+            self.conf_model.compile(optimizer='adam',
+                                    loss=self.loss_conf,
+                                    metrics=['accuracy'])
+            hist = self.conf_model.fit(pc_scores, labels, epochs=200)
+
+            acc.append(hist.history.get('accuracy')[-1]) 
+
+            self.conf_model.load_weights('weights.h5')
+
+        return acc
+
 
 
 
