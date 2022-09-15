@@ -92,7 +92,7 @@ class DataHandler:
         self.batches.append(asymm)
         self.batches_names.append(name)
 
-    def prepare_XYE_PCA(self, batch_ind=[0], batch_names=[]):
+    def prepare_XYE_PCA(self, batch_ind=[0], batch_names=[], a_e=None):
         r''' Function that prepares the choosen data batches into matrix form,
         that is all of the y, x and error vectors are presented as matrices
         Y, X and E. (TODO: make batch_names work)
@@ -105,11 +105,11 @@ class DataHandler:
             preprocessed together (not yet implemented)
         '''
 
-        a, e, _, x = self.filter_data(batch_ind=batch_ind)
+        a, e, _, x = self.filter_data(batch_ind=batch_ind, a=a_e)
 
         self.prepared_data.append(np.array([a, x]))
 
-    def filter_data(self, batch_ind=[0]):
+    def filter_data(self, batch_ind=[0], a=None):
         r''' Function that re-bin the data to equalise the error in each bin.
 
         Args:
@@ -137,7 +137,8 @@ class DataHandler:
         Len1 = np.array([1])
         t1 = t[0,:][np.newaxis]
 
-        a = np.sum(E[0,:] ** 2)
+        if a == None:
+            a = np.sum(E[0,:] ** 2)
 
         Etemp = np.array([])
         Atemp = np.empty([0,yd])
