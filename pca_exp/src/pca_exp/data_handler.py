@@ -92,7 +92,7 @@ class DataHandler:
         self.batches.append(asymm)
         self.batches_names.append(name)
 
-    def prepare_XYE_PCA(self, batch_ind=[0], batch_names=[], a_e=None):
+    def prepare_XYE_PCA(self, batch_ind=[0], batch_names=[], a_e=None, filter_data=True):
         r''' Function that prepares the choosen data batches into matrix form,
         that is all of the y, x and error vectors are presented as matrices
         Y, X and E. (TODO: make batch_names work)
@@ -105,7 +105,11 @@ class DataHandler:
             preprocessed together (not yet implemented)
         '''
 
-        a, e, _, x = self.filter_data(batch_ind=batch_ind, a=a_e)
+        if filter_data:
+            a, e, _, x = self.filter_data(batch_ind=batch_ind, a=a_e)
+        else:
+            a = self.batches[batch_ind[0]][:,:,1]
+            x = self.batches[batch_ind[0]][:,:,0]
 
         self.prepared_data.append(np.array([a, x]))
 
@@ -149,8 +153,9 @@ class DataHandler:
             Atemp = np.append(Atemp, A[ii,:][np.newaxis],axis=0)
             ttemp = np.append(ttemp, t[ii,:][np.newaxis],axis=0)
 
+            print("Processed data: " + str(ii) + " / " + str(xd))
             
-            if np.sum(1 / Etemp) > 1 or ii == xd - 1:
+            if Etemp[-1] == 0 or np.sum(1 / Etemp) > 1 or ii == xd - 1:
                 A1 = np.append(A1,(np.sum(Atemp,axis=0) / Atemp.shape[0])
                             [np.newaxis], axis=0)
                 E1 = np.append(E1,np.sqrt(np.sum( a * Etemp) / yd) /  len(Etemp))

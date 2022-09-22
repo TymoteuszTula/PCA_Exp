@@ -75,6 +75,8 @@ class PCAMachine:
             prep_ind: integer that specifies the data, on which PCA is 
             performed.
         '''
+
+        # TODO Change this to do a PCA on smaller dimension.
         data_hand = self.data_handler
         a = data_hand.prepared_data[prep_ind][0]
         av = np.sum(a, axis = 1)[np.newaxis].T / a.shape[1]
