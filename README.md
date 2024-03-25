@@ -9,7 +9,11 @@ x      y      ey
 0.3    0.28   0.015
 ...    ...    ...
 ```
-the code can preprocess it, join different sets of measurements, perform PCA and return the results. 
+the code can preprocess it, join different sets of measurements, perform PCA and return the results.
+
+To cite the code please use following DOI:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4495484.svg)](https://doi.org/10.5281/zenodo.4495484)
 
 ### Requirements
 - Python v3.0 or higher
