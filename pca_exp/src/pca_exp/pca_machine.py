@@ -83,7 +83,7 @@ class PCAMachine:
         z = a - av
 
         print('Performing PCA on prepared data')
-        curves, sing, _ = np.linalg.svd(z)
+        curves, sing, _ = np.linalg.svd(z, full_matrices=False)
         scores = np.dot(curves.T, z)  
 
         self.pc_scores.append(scores)

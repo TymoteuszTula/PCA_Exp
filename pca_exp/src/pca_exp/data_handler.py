@@ -5,6 +5,8 @@
 # libraries
 
 import numpy as np
+from math import sqrt
+import time
 
 # internal modules
 
@@ -92,7 +94,7 @@ class DataHandler:
         self.batches.append(asymm)
         self.batches_names.append(name)
 
-    def prepare_XYE_PCA(self, batch_ind=[0], batch_names=[], a_e=None, filter_data=True):
+    def prepare_XYE_PCA(self, batch_ind=[0], batch_names=[], a_e=None, filter_data=True, save_times=False):
         r''' Function that prepares the choosen data batches into matrix form,
         that is all of the y, x and error vectors are presented as matrices
         Y, X and E. (TODO: make batch_names work)
@@ -106,14 +108,19 @@ class DataHandler:
         '''
 
         if filter_data:
-            a, e, _, x = self.filter_data(batch_ind=batch_ind, a=a_e)
+            if save_times:
+                a, e, _, x, times = self.filter_data(batch_ind=batch_ind, a=a_e, save_times=True)
+            else:
+                a, e, _, x = self.filter_data(batch_ind=batch_ind, a=a_e)
         else:
             a = self.batches[batch_ind[0]][:,:,1]
             x = self.batches[batch_ind[0]][:,:,0]
 
         self.prepared_data.append(np.array([a, x]))
+        if save_times:
+            return times
 
-    def filter_data(self, batch_ind=[0], a=None):
+    def filter_data(self, batch_ind=[0], a=None, save_times=False):
         r''' Function that re-bin the data to equalise the error in each bin.
 
         Args:
@@ -136,42 +143,77 @@ class DataHandler:
         xd = A.shape[0]
         yd = A.shape[1]
 
-        A1 = A[0,:][np.newaxis]
-        E1 = np.array([np.sqrt(np.sum(E[0,:] ** 2) / yd)])
-        Len1 = np.array([1])
-        t1 = t[0,:][np.newaxis]
+        # A1 = A[0,:][np.newaxis]
+        # E1 = np.array([np.sqrt(np.sum(E[0,:] ** 2) / yd)])
+        # Len1 = np.array([1])
+        # t1 = t[0,:][np.newaxis]
 
         if a == None:
             a = np.sum(E[0,:] ** 2)
 
-        Etemp = np.array([])
-        Atemp = np.empty([0,yd])
-        ttemp = np.empty([0,yd])
+        A1 = []
+        E1 = []
+        Len1 = []
+        t1 = []
 
-        for ii in range(1, xd):
-            Etemp = np.append(Etemp, np.sum(E[ii,:] ** 2 / a))
-            Atemp = np.append(Atemp, A[ii,:][np.newaxis],axis=0)
-            ttemp = np.append(ttemp, t[ii,:][np.newaxis],axis=0)
+        Etemp = 0
+        Atemp = np.zeros((yd, )) # np.empty([0,yd])
+        ttemp = np.zeros((yd, )) # np.empty([0,yd])
+        no_of_bins = 0
+        start_time = time.time()
+        # Count times (only temporary)
+        if save_times:
+            times = []
 
-            print("Processed data: " + str(ii) + " / " + str(xd))
+        for ii in range(xd):
             
-            if Etemp[-1] == 0 or np.sum(1 / Etemp) > 1 or ii == xd - 1:
-                A1 = np.append(A1,(np.sum(Atemp,axis=0) / Atemp.shape[0])
-                            [np.newaxis], axis=0)
-                E1 = np.append(E1,np.sqrt(np.sum( a * Etemp) / yd) /  len(Etemp))
-                t1 = np.append(t1,(np.sum(ttemp,axis=0) / ttemp.shape[0])
-                            [np.newaxis], axis=0)
-                Len1 = np.append(Len1,Atemp.shape[0])
+            #Etemp = np.append(Etemp, np.sum(E[ii,:] ** 2 / a))
+            Etemp += np.sum(E[ii,:] ** 2) / a
+            #Atemp = np.append(Atemp, A[ii,:][np.newaxis],axis=0)
+            Atemp += A[ii,:]
+            #ttemp = np.append(ttemp, t[ii,:][np.newaxis],axis=0)
+            ttemp += t[ii,:]
+            no_of_bins += 1
 
-                Etemp = np.array([])
-                Atemp = np.empty([0,yd])
-                ttemp = np.empty([0,yd])
+            #stop_time = time.time()
+            print("Processed data: " + str(ii) + " / " + str(xd) + " # Number of new bins: " + str(len(Len1)))
+            # if save_times:
+            #     times.append(stop_time-start_time)
+            #start_time = time.time()
+
+            if Etemp == 0 or no_of_bins**2 / Etemp > 1 or ii == xd - 1:
+                # #A1 = np.append(A1,(np.sum(Atemp,axis=0) / Atemp.shape[0])
+                # #            [np.newaxis], axis=0)
+                # A1 = np.append(A1, Atemp / no_of_bins, axis=0)
+                # #E1 = np.append(E1,np.sqrt(np.sum( a * Etemp) / yd) /  len(Etemp))
+                # E1 = np.append(E1, sqrt(a * Etemp) / yd / no_of_bins)
+                # #t1 = np.append(t1,(np.sum(ttemp,axis=0) / ttemp.shape[0])
+                # #            [np.newaxis], axis=0)
+                # t1 = np.append(t1, ttemp / no_of_bins, axis=0)
+                # #Len1 = np.append(Len1,Atemp.shape[0])
+                # Len1 = np.append(Len1, no_of_bins)
+
+                A1.append(Atemp / no_of_bins)
+                E1.append(sqrt(a * Etemp) / yd / no_of_bins)
+                t1.append(ttemp / no_of_bins)
+                Len1.append(no_of_bins)
+
+                Etemp = 0
+                Atemp = np.zeros((yd, ))
+                ttemp = np.zeros((yd, ))
+                no_of_bins = 0
 
         A1 = A1[:-1]
         E1 = E1[:-1]
         t1 = t1[:-1]
         Len1 = Len1[:-1]
 
+        A1 = np.array(A1)
+        E1 = np.array(E1)
+        t1 = np.array(t1)
+
+        if save_times:
+            return A1, E1, Len1, t1, times
         return A1, E1, Len1, t1 
 
 
