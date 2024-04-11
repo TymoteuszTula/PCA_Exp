@@ -31,8 +31,9 @@ class DataHandler:
         self.batches = []
         self.batches_names = []
         self.prepared_data = []
+        self.batch_info = []
 
-    def load_batch(self, stsp, prenum='', ext='', loc='./', excep=[], name='',
+    def load_batch(self, stsp, prenum='', ext='', loc='./', excep=[], name=None,
                    indicators=[], delimiter=None, skiprows=0):
         r''' Function that adds a batch of data to the class from a set of 
         files in one folder. The batch is stored as 3-D numpy array where
@@ -76,7 +77,10 @@ class DataHandler:
         batch = np.transpose(batch, (1, 0, 2))    
 
         self.batches.append(np.array(batch))
-        self.batches_names.append(name)
+        if name == None:
+            self.batches_names.append(str(len(self.batches_names)))
+        else:
+            self.batches_names.append(name)
 
     def load_batch_from_array(self, asymm, name=''):
         r''' Function that load batch from numpy array. The array should be of
@@ -94,7 +98,8 @@ class DataHandler:
         self.batches.append(asymm)
         self.batches_names.append(name)
 
-    def prepare_XYE_PCA(self, batch_ind=[0], batch_names=[], a_e=None, filter_data=True, save_times=False):
+    def prepare_XYE_PCA(self, batch_ind=[0], a_e=None, 
+                        filter_data=True, preserve_batch_info=True):
         r''' Function that prepares the choosen data batches into matrix form,
         that is all of the y, x and error vectors are presented as matrices
         Y, X and E. (TODO: make batch_names work)
@@ -108,17 +113,17 @@ class DataHandler:
         '''
 
         if filter_data:
-            if save_times:
-                a, e, _, x, times = self.filter_data(batch_ind=batch_ind, a=a_e, save_times=True)
-            else:
-                a, e, _, x = self.filter_data(batch_ind=batch_ind, a=a_e)
+            a, e, _, x, err = self.filter_data2(batch_ind=batch_ind, a=a_e)
         else:
             a = self.batches[batch_ind[0]][:,:,1]
             x = self.batches[batch_ind[0]][:,:,0]
 
-        self.prepared_data.append(np.array([a, x]))
-        if save_times:
-            return times
+        if preserve_batch_info:
+            self.batch_info.append(
+                [{"bidx": i,
+                  "mlen": self.batches[i].shape[1]} for i in batch_ind])
+
+        self.prepared_data.append(np.array([a, x, err]))
 
     def filter_data(self, batch_ind=[0], a=None, save_times=False):
         r''' Function that re-bin the data to equalise the error in each bin.
@@ -215,8 +220,71 @@ class DataHandler:
         if save_times:
             return A1, E1, Len1, t1, times
         return A1, E1, Len1, t1 
+    
+    def filter_data2(self, batch_ind=[0], a=None, save_times=False):
+        r''' Function that re-bin the data to equalise the error in each bin.
 
+        Args:
+            batch_ind: list of integers that specify which batches are 
+            preprocessed together.
+        '''
 
+        # Code designed to work with error calculations
+
+        t = self.batches[batch_ind[0]][:,:,0]
+        A = self.batches[batch_ind[0]][:,:,1]
+        E = self.batches[batch_ind[0]][:,:,2]
+
+        for batch_i in batch_ind[1:]:
+            t = np.c_[t, self.batches[batch_ind[batch_i]][:,:,0]] 
+            A = np.c_[A, self.batches[batch_ind[batch_i]][:,:,1]] 
+            E = np.c_[E, self.batches[batch_ind[batch_i]][:,:,2]]
+
+        xd = A.shape[0]
+        yd = A.shape[1]
+
+        #A1 = A[0,:][np.newaxis]
+        #E1 = np.array([np.sqrt(np.sum(E[0,:] ** 2) / yd)])
+        #E_new = E[0,:].copy()[np.newaxis]
+        #Len1 = np.array([1])
+        #t1 = t[0,:][np.newaxis]
+        A1 = np.empty([0, yd])
+        E1 = np.empty([0, yd])
+        E_new = np.empty([0, yd])
+        Len1 = np.array([])
+        t1 = np.empty([0, yd])
+
+        if a == None:
+            a = np.sum(E[0,:] ** 2)
+
+        Etemp = np.array([])
+        E_newtemp = np.empty([0,yd])
+        Atemp = np.empty([0,yd])
+        ttemp = np.empty([0,yd])
+
+        for ii in range(0, xd):
+            Etemp = np.append(Etemp, np.sum(E[ii,:] ** 2 / a))
+            E_newtemp = np.append(E_newtemp, E[ii,:][np.newaxis],axis=0)
+            Atemp = np.append(Atemp, A[ii,:][np.newaxis],axis=0)
+            ttemp = np.append(ttemp, t[ii,:][np.newaxis],axis=0)
+            
+            
+            if np.sum(1 / Etemp) > 1 or ii == xd - 1:
+                A1 = np.append(A1,(np.sum(Atemp,axis=0) / Atemp.shape[0])
+                            [np.newaxis], axis=0)
+                E1 = np.append(E1,np.sqrt(np.sum( a * Etemp) / yd) /  len(Etemp))
+                E_new = np.append(E_new, (np.sqrt(np.sum(E_newtemp**2, axis=0)) / len(Etemp))
+                            [np.newaxis], axis=0)
+                t1 = np.append(t1,(np.sum(ttemp,axis=0) / ttemp.shape[0])
+                            [np.newaxis], axis=0)
+                Len1 = np.append(Len1,Atemp.shape[0])
+
+                Etemp = np.array([])
+                E_newtemp = np.empty([0,yd])
+                Atemp = np.empty([0,yd])
+                ttemp = np.empty([0,yd])
+
+        return A1, E1, Len1, t1, E_new
 
     def bin_data(self, x_0, batch_ind=[0], batch_names=[]):
         r''' Function that bin the data to common bins. Use it if your batches

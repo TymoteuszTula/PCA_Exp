@@ -44,6 +44,7 @@ class PCAMachine:
         self.pc_av = []
         self.pc_sing = []
         self.pc_z = []
+        self.error = []
         self.data_handler = data_handler
 
     def print_pca_representation(self):
@@ -81,6 +82,7 @@ class PCAMachine:
         a = data_hand.prepared_data[prep_ind][0]
         av = np.sum(a, axis = 1)[np.newaxis].T / a.shape[1]
         z = a - av
+        e = data_hand.prepared_data[prep_ind][2]
 
         print('Performing PCA on prepared data')
         curves, sing, _ = np.linalg.svd(z, full_matrices=False)
@@ -91,9 +93,95 @@ class PCAMachine:
         self.pc_av.append(av)
         self.pc_sing.append(sing)
         self.pc_z.append(z)
+        self.error.append(e)
 
         print('Showing the percentage of covariance of most important PCs:')
         self.print_pca_representation()
+
+    def return_range_given_bname_or_bidx(self, batch_ind=None, batch_name=None,
+                                         prepared_data_ind=0):
+        batch_info = self.data_handler.batch_info[prepared_data_ind]
+        no_of_b = len(batch_info)
+        if batch_ind == None and batch_name == None:
+            raise Exception("Either batch ind or batch name has to be provided")
+        elif batch_name == None:
+            batch_idcs_in_prepared = [batch_info[i]["bidx"] for i in range(no_of_b)]
+            if batch_ind not in batch_idcs_in_prepared:
+                raise Exception("Batch index not in prepared set")
+            else:
+                prep_idx = batch_idcs_in_prepared.index(batch_ind)
+        elif batch_ind == None:
+            batch_names = self.data_handler.batches_names
+            batch_names_in_prepared = [batch_names[batch_info[i]["bidx"]] for i in range(no_of_b)]
+            if batch_name not in batch_names_in_prepared:
+                raise Exception("Batch name not in prepared set")
+            else:
+                prep_idx = batch_names_in_prepared.index(batch_name)
+
+        if prep_idx == 0:
+            range_om = [0, batch_info[0]["mlen"]]
+        else:
+            low_range = np.sum(np.array([batch_info[i]["mlen"] for i in range(prep_idx)]))
+            range_om = [low_range, low_range + batch_info[prep_idx]["mlen"]]
+
+        return prep_idx, range_om
+
+    def return_scores_of_given_batch(self, batch_ind=None, batch_name=None, 
+                                     prepared_data_ind=0):
+        _, range_om = self.return_range_given_bname_or_bidx(batch_ind=batch_ind,
+                                                         batch_name=batch_name,
+                                                         prepared_data_ind=prepared_data_ind)
+        
+        return self.pc_scores[prepared_data_ind][:,range_om[0]:range_om[1]]
+
+    def calculate_pc_scores_error(self, prepared_data_ind=0, use_names=True):
+        batch_info = self.data_handler.batch_info[prepared_data_ind]
+        no_pcs = self.pc_scores[prepared_data_ind].shape[0]
+        er_pcs = []
+        pc_cur = self.pc_curves[prepared_data_ind]
+        err_sd = self.error[prepared_data_ind]
+        for i in range(no_pcs):
+            err_temp = np.sqrt(np.sum((pc_cur[:,i] * err_sd.T)**2, axis=1))
+            er_pcs.append(err_temp)
+
+        er_pcs = np.array(er_pcs)
+        if use_names == True:
+            batch_names = self.data_handler.batches_names
+            er_pcs_sect = {}
+        else:
+            er_pcs_sect = []
+        for i in range(len(batch_info)):
+            _, range_om = self.return_range_given_bname_or_bidx(
+                batch_ind=batch_info[i]["bidx"],
+                prepared_data_ind=prepared_data_ind
+            )
+            if use_names == True:
+                er_pcs_sect[batch_names[batch_info[i]["bidx"]]] = er_pcs[:,range_om[0]:range_om[1]]
+            else:
+                er_pcs_sect.append(er_pcs[:,range_om[0]:range_om[1]])
+
+        return er_pcs_sect
+
+    def calculate_cPCS(self, prepared_data_ind=0, use_names=True):
+        if use_names:
+            batch_names = self.data_handler.batches_names
+            cPCS = {}
+        else:
+            cPCS = []
+        # batch_info = self.data_handler.batch_info[prepared_data_ind]
+        # for i in range(len(batch_info)):
+        #     pc_score = self.return_scores_of_given_batch(i, prepared_data_ind)
+        #     cPCS.append(np.sum(np.abs(pc_score), axis=1))
+        batch_info = self.data_handler.batch_info[prepared_data_ind]
+        for i in range(len(batch_info)):
+            pc_score = self.return_scores_of_given_batch(batch_ind=batch_info[i]["bidx"], 
+                                                         prepared_data_ind=prepared_data_ind)
+            if use_names:
+                cPCS[batch_names[batch_info[i]["bidx"]]] = np.sum(np.abs(pc_score), axis=1)
+            else:
+                cPCS.append(np.sum(np.abs(pc_score), axis=1))
+
+        return cPCS
 
     def show_pca_results_1(self, param1, param1_name='param1', res_idx=0,
                                  prep_idx=0):
