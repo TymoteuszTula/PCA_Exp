@@ -66,8 +66,10 @@ class DataHandler:
 
         no_meas = stsp[1] - stsp[0] - len(excep) + 1
         batch = []
-    
-        enum = np.delete(range(stsp[0], stsp[1] + 1), excep)
+
+        enum = list(range(stsp[0], stsp[1] + 1))
+        for exc in excep:
+            enum.remove(exc)
 
         for meas in enum:
             path = loc + prenum + str(meas) + ext
