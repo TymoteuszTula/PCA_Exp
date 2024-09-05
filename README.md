@@ -15,6 +15,14 @@ To cite the code please use following DOI:
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4495484.svg)](https://doi.org/10.5281/zenodo.4495484)
 
+To cite the method, in particular in its application to Muon Spin Releaxation, please use the following academic reference:
+
+T Tula, G Möller, J Quintanilla, S R Giblin, A D Hillier, E E McCabe, S Ramos, D S Barker, and S Gibson, 
+"Machine learning approach to muon spectroscopy analysis",
+J. Phys.: Condens. Matter 33, 194002 (2021)
+
+[![DOI](https://zenodo.org/badge/DOI/10.1088/1361-648X/abe39e.svg)](https://doi.org/10.1088/1361-648X/abe39e)
+
 ### Requirements
 - Python v3.0 or higher
 - numPy 
